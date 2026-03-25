@@ -1,3 +1,5 @@
+// Prerequisite: Ensure that kubeconfig is set up and the correct Kubernetes context is selected before running this pipeline.
+
 pipeline {
 	agent any
 
@@ -20,7 +22,7 @@ pipeline {
 
 		stage('Docker build') {
 			steps {
-				sh 'docker build -t ivsaradhi/ivs-docker-demo:ivs-docker-demo .'
+				sh 'docker build -t ivsaradhi/ivs-docker-demo:latest .'
 				sh 'docker images'
 			}
 		}
@@ -29,8 +31,7 @@ pipeline {
 			steps {
 				withCredentials([string(credentialsId: 'DockerHubID', variable: 'PASSWORD')]) {
 					sh 'echo $PASSWORD | docker login -u ivsaradhi --password-stdin'
-					sh 'docker push ivsaradhi/ivs-docker-demo:ivs-docker-demo'
-				}
+					sh 'docker push ivsaradhi/ivs-docker-demo:latest'
 				}
 			}
 		}
@@ -42,4 +43,3 @@ pipeline {
 			}
 		}
 	}
-}
