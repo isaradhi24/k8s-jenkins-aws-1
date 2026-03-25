@@ -1,0 +1,45 @@
+pipeline {
+	agent any
+
+	tools {
+		gradle 'Gradle-9.4.1'
+	}
+
+	stages {
+		stage('Git Clone') {
+			steps {
+				git credentialsId: 'GitHub_ID', url: 'https://github.com/isaradhi24/k8s-jenkins-aws-1'
+			}
+		}
+
+		stage('Gradle Build') {
+			steps {
+				sh 'gradle build'
+			}
+		}
+
+		stage('Docker build') {
+			steps {
+				sh 'docker build -t ivsaradhi/ivs-docker-demo:ivs-docker-demo .'
+				sh 'docker images'
+			}
+		}
+
+		stage('Docker Login & Push') {
+			steps {
+				withCredentials([string(credentialsId: 'DockerHubID', variable: 'PASSWORD')]) {
+					sh 'echo $PASSWORD | docker login -u ivsaradhi --password-stdin'
+					sh 'docker push ivsaradhi/ivs-docker-demo:ivs-docker-demo'
+				}
+				}
+			}
+		}
+
+		// Ensure that kubeconfig is set up and the correct Kubernetes context is selected before running this stage.
+		stage('Kubernetes Deployment') {
+			steps {
+				sh 'kubectl apply -f k8s-spring-boot-deployment.yml'
+			}
+		}
+	}
+}
