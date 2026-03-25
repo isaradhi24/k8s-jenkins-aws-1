@@ -4,7 +4,7 @@ pipeline {
 	agent any
 
 	tools {
-		gradle 'Gradle-9.4.1'
+		gradle 'Gradle-6.9'
 	}
 
 	stages {
@@ -43,3 +43,4 @@ pipeline {
 			}
 		}
 	}
+}
